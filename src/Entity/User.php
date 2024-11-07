@@ -4,16 +4,31 @@ namespace App\Entity;
 
 use App\Entity\Utils\BaseEntity;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Email;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Column(length: 180, nullable: false, type: 'string')]
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->assignedTickets = new ArrayCollection();
+        $this->actions = new ArrayCollection();
+    }
+
+    #[ORM\Column(length: 255, unique: true, nullable: false)]
+    #[Assert\Email(
+        mode: Email::VALIDATION_MODE_STRICT
+    )]
     private string $email;
 
     /**
@@ -28,6 +43,11 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     #[ORM\Column]
     private string $password;
 
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'assignedTo')]
+    private Collection $assignedTickets;
+
+    #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'changedBy')]
+    private Collection $actions;
 
     public function getEmail(): string
     {
@@ -97,5 +117,15 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getAssignedTickets(): Collection
+    {
+        return $this->assignedTickets;
+    }
+
+    public function getAction(): Collection
+    {
+        return $this->actions;
     }
 }
