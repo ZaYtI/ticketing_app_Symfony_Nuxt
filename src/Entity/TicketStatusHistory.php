@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Utils\BaseEntity;
 use App\Entity\Utils\Status;
 use App\Repository\TicketStatusHistoryRepository;
+use DateTime;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,7 +22,7 @@ class TicketStatusHistory extends BaseEntity
         $this->changeAt = new \DateTime();
     }
 
-    #[ORM\Column(type: "string", length: 255, nullable: false, enumType: Status::class)]
+    #[ORM\Column(type: 'integer', nullable: false, enumType: Status::class)]
     private Status $status;
 
     #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'statusHistory')]
@@ -42,7 +43,7 @@ class TicketStatusHistory extends BaseEntity
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(Status $status): static
     {
         $this->status = $status;
 
@@ -54,13 +55,30 @@ class TicketStatusHistory extends BaseEntity
         return $this->ticket;
     }
 
+    public function setTicket(Ticket $ticket): void
+    {
+        $this->ticket = $ticket;
+    }
+
+
+
     public function getChangeAt(): \DateTime
     {
         return $this->changeAt;
     }
 
+    public function setChangeAt(DateTime $changeAt): void
+    {
+        $this->changeAt = $changeAt;
+    }
+
     public function getChangedBy(): User
     {
         return $this->changedBy;
+    }
+
+    public function setChangedBy(User $user)
+    {
+        $this->changedBy = $user;
     }
 }
