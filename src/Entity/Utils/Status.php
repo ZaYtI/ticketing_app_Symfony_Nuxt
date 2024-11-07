@@ -2,10 +2,10 @@
 
 namespace App\Entity\Utils;
 
-enum Status: string
+enum Status: int
 {
-    case OPEN = 'Ouvert';
-    case IN_PROGRESS = 'En cours';
-    case RESOLVE = 'Résolue';
-    case CLOSE = 'Fermé';
+    case OPEN = 1;
+    case IN_PROGRESS = 2;
+    case RESOLVE = 3;
+    case CLOSE = 4;
 }

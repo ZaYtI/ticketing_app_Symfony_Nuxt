@@ -29,11 +29,11 @@ class Ticket extends BaseEntity
     #[Assert\NotNull()]
     private string $description;
 
-    #[ORM\Column(enumType: Status::class)]
+    #[ORM\Column(enumType: Status::class, type: 'integer')]
     #[Assert\Isin(Status::class)]
     private Status $status;
 
-    #[ORM\Column(enumType: Priority::class)]
+    #[ORM\Column(enumType: Priority::class, type: 'integer', nullable: false)]
     #[Assert\Isin(Priority::class)]
     private Priority $priority;
 

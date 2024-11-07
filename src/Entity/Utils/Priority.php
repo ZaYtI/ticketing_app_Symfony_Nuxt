@@ -2,9 +2,9 @@
 
 namespace App\Entity\Utils;
 
-enum Priority: string
+enum Priority: int
 {
-    case LOW = 'Basse';
-    case MEDIUM = 'Moyenne';
-    case HIGH = 'Haute';
+    case LOW = 1;
+    case MEDIUM = 2;
+    case HIGH = 3;
 }
