@@ -7,9 +7,11 @@ use App\Entity\Utils\Priority;
 use App\Entity\Utils\Status;
 use App\Repository\TicketRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket extends BaseEntity
@@ -19,33 +21,41 @@ class Ticket extends BaseEntity
         parent::__construct();
         $this->status = Status::OPEN;
         $this->priority = Priority::LOW;
+        $this->statusHistory = new ArrayCollection();
     }
 
     #[ORM\Column(length: 255)]
     #[Assert\NotNull()]
+    #[Groups(['ticket.index'])]
     private string $title;
 
     #[ORM\Column(type: 'text', length: 16777215)]
     #[Assert\NotNull()]
+    #[Groups(['ticket.show'])]
     private string $description;
 
     #[ORM\Column(enumType: Status::class, type: 'integer')]
     #[Assert\Isin(Status::class)]
+    #[Groups(['ticket.index'])]
     private Status $status;
 
     #[ORM\Column(enumType: Priority::class, type: 'integer', nullable: false)]
     #[Assert\Isin(Priority::class)]
+    #[Groups(['ticket.index'])]
     private Priority $priority;
 
     #[ORM\Column(type: 'datetime', nullable: true, name: 'dead_line')]
     #[Assert\DateTime()]
+    #[Groups(['ticket.index'])]
     private ?DateTime $deadLine = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'assignedTickets')]
     #[ORM\JoinColumn(name: 'assign_user_id')]
+    #[Groups(['ticket.show'])]
     private ?User $assignedTo = null;
 
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'ticket')]
+    #[Groups(['ticket.show'])]
     private Collection $statusHistory;
 
     public function getTitle(): string
