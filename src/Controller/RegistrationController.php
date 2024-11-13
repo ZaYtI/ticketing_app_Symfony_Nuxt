@@ -44,7 +44,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             return $this->json([
-                'message' => 'User registered successfully. Please check your email to confirm your account.'
+                'message' => 'User registered successfully.'
             ], JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to save user: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
