@@ -18,10 +18,21 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class TicketController extends AbstractController
 {
     #[Route('api/ticket', name: 'findAllTicket', methods: 'GET')]
-    public function index(TicketRepository $repository): JsonResponse
+    public function index(TicketRepository $repository, Request $request): JsonResponse
     {
-        $tickets = $repository->findAll();
-        return $this->json($tickets, 200, [], [
+
+        $page = (int) $request->query->get('page', 1);
+        $limit = (int) $request->query->get('limit', 10);
+
+        $paginatedTickets = $repository->findTicketsWithPaginationAndFilters([], $page, $limit);
+        return $this->json([
+            'items' => $paginatedTickets->getItems(),
+            'meta' => [
+                'total_items' => $paginatedTickets->getTotalItemCount(),
+                'current_page' => $paginatedTickets->getCurrentPageNumber(),
+                'total_pages' => $paginatedTickets->getTotalItemCount() / $limit,
+            ]
+        ], 200, [], [
             'groups' => ['ticket.index']
         ]);
     }
