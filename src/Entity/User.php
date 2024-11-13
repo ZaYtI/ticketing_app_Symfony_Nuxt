@@ -23,6 +23,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         parent::__construct();
         $this->assignedTickets = new ArrayCollection();
         $this->actions = new ArrayCollection();
+        $this->roles = ['ROLE_USER'];
     }
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
@@ -35,7 +36,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    private array $roles = [];
+    private array $roles;
 
     /**
      * @var string The hashed password
