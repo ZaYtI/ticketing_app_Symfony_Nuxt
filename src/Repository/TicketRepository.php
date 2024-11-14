@@ -14,7 +14,7 @@ use Knp\Component\Pager\PaginatorInterface;
 class TicketRepository extends ServiceEntityRepository
 {
 
-    private $paginator;
+    private PaginatorInterface $paginator;
 
     public function __construct(ManagerRegistry $registry, PaginatorInterface $paginator)
     {
