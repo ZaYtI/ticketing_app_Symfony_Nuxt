@@ -15,12 +15,13 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, User::class);
-    }
 
     private PaginatorInterface $paginator;
+    public function __construct(ManagerRegistry $registry,PaginatorInterface $paginator)
+    {
+        parent::__construct($registry, User::class);
+        $this->paginator = $paginator;
+    }
 
     /**
      * Used to upgrade (rehash) the user's password automatically over time.

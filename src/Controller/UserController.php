@@ -23,10 +23,7 @@ class UserController extends AbstractController
 
         $paginatedUsers = $userRepo->findUsersWithPagination($page, $limit);
 
-        $totalPages = (int) ($paginatedUsers->getTotalItemCount() / $limit);
-        if($paginatedUsers->getTotalItemCount() % $limit){
-            $totalPages++;
-        }
+        $totalPages = (int) ceil($paginatedUsers->getTotalItemCount() / $limit);
         $nextPageUrl = $page < $totalPages
             ? 'http://localhost:8000/api/ticket?page=' . ($page + 1) . '&limit=' . $limit
             : null;
@@ -39,6 +36,6 @@ class UserController extends AbstractController
                 'total_pages' => $totalPages,
                 'next_pages' => $nextPageUrl
             ]
-        ]);
+        ],200,[],['groups' => ['user.index']]);
     }
 }
