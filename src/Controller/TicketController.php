@@ -58,7 +58,6 @@ class TicketController extends AbstractController
     }
 
     #[Route('api/ticket/{id}', name: 'detailTicket', requirements: ['id' => Requirement::DIGITS], methods: 'GET')]
-    #[IsGranted('ROLE_ADMIN', message: 'You must be an admin for this action')]
     public function show(Ticket $ticket): JsonResponse
     {
         return $this->json($ticket, 200, [], [
