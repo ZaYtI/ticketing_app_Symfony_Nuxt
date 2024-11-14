@@ -39,13 +39,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email(
         mode: Email::VALIDATION_MODE_STRICT
     )]
-    #[Groups(['ticket.show', 'ticket.index'])]
+    #[Groups(['ticket.show', 'ticket.index','user.index'])]
     private string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['user.index'])]
     private array $roles;
 
     /**
@@ -61,6 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $actions;
 
     #[ORM\Column(type: 'datetime', nullable: false, name: 'created_at', options: ["default" => "CURRENT_TIMESTAMP"])]
+    #[Groups(['user.index'])]
     private DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: false, name: 'updated_at', options: ["default" => "CURRENT_TIMESTAMP"])]
