@@ -13,8 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
-use function PHPSTORM_META\type;
-
 #[ORM\Entity(repositoryClass: TicketRepository::class)]
 class Ticket
 {
