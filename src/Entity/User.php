@@ -32,21 +32,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['ticket.show', 'user.index', 'user.show'])]
+    #[Groups(['ticket.show', 'user.index', 'user.show', 'user.show'])]
     private int $id;
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
     #[Assert\Email(
         mode: Email::VALIDATION_MODE_STRICT
     )]
-    #[Groups(['ticket.show', 'ticket.index','user.index'])]
+    #[Groups(['ticket.show', 'user.index', 'user.show'])]
     private string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['user.index'])]
+    #[Groups(['user.index', 'user.show'])]
     private array $roles;
 
     /**
@@ -56,13 +56,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'assignedTo')]
+    #[Groups(['user.show'])]
     private Collection $assignedTickets;
 
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'changedBy')]
     private Collection $actions;
 
     #[ORM\Column(type: 'datetime', nullable: false, name: 'created_at', options: ["default" => "CURRENT_TIMESTAMP"])]
-    #[Groups(['user.index'])]
+    #[Groups(['user.index', 'user.show'])]
     private DateTime $createdAt;
 
     #[ORM\Column(type: 'datetime', nullable: false, name: 'updated_at', options: ["default" => "CURRENT_TIMESTAMP"])]

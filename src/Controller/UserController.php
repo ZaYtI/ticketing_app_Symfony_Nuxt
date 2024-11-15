@@ -2,22 +2,24 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('api/user')]
 class UserController extends AbstractController
 {
-    #[Route('/api/user', name: 'app_user')]
-    #[IsGranted('ROLE_ADMIN', message: 'No access! Get out!')]
+    #[Route('/', name: 'app_user', methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN', message: 'You must be an admin for this action')]
     public function index(
         UserRepository $userRepo,
         Request $request
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $page = (int) $request->query->get('page', 1);
         $limit = (int) $request->query->get('limit', 10);
 
@@ -36,6 +38,15 @@ class UserController extends AbstractController
                 'total_pages' => $totalPages,
                 'next_pages' => $nextPageUrl
             ]
-        ],200,[],['groups' => ['user.index']]);
+        ], 200, [], ['groups' => ['user.index']]);
+    }
+
+    #[Route('/{id}', name: 'app_user_show', requirements: ['id' => Requirement::DIGITS], methods: 'GET')]
+    #[IsGranted('ROLE_ADMIN', message: 'You must be an admin for this action')]
+    public function show(User $user): JsonResponse
+    {
+        return $this->json($user, 200, [], [
+            'groups' => ['user.index', 'user.show', 'ticket.index']
+        ]);
     }
 }
