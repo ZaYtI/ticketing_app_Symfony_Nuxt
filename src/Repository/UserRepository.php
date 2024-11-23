@@ -47,4 +47,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $limit
         );
     }
+
+    public function findByRole(string $role): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%"' . $role . '"%') // Ajout des guillemets autour de ROLE_USER pour correspondre au JSON
+            ->getQuery()
+            ->getResult();
+    }
+
+
 }

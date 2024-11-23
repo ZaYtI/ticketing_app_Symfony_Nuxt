@@ -124,4 +124,44 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN', message: 'Access denied!')]
+    #[Route('/api/user/by-role', name: 'search_user_by_role', methods: ['GET'])]
+    public function searchByRole(Request $request, UserRepository $userRepo): JsonResponse
+    {
+        $role = $request->query->get('role');
+        if (!$role) {
+            return $this->json(['error' => 'Veuillez saisir un rôle.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        if($role == 'ROLE_ADMIN' || $role == 'ROLE_USER' || $role == 'ROLE_SUPPORT') {
+            $users = $userRepo->findByRole($role);
+            return $this->json($users, JsonResponse::HTTP_OK, [], ['groups' => ['user.index', 'user.show']]);
+        }
+        else{
+            return $this->json(['error' => 'Rôle saisie incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+    }
+
+    #[IsGranted('ROLE_ADMIN', message: 'Access denied!')]
+    #[Route('/api/user/search', name: 'search_user_by_email_or_id', methods: ['GET'])]
+    public function searchByEmailOrId(Request $request, UserRepository $userRepo): JsonResponse
+    {
+        $email = $request->query->get('email');
+        $id = $request->query->get('id');
+
+        if (!$email && !$id) {
+            return $this->json(['error' => 'Veuillez saisir un email ou un ID.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $user = $email
+            ? $userRepo->findOneBy(['email' => $email])
+            : $userRepo->findOneby(['id' => $id]);
+
+        if (!$user) {
+            return $this->json(['error' => 'Pas d\'utilisateur trouvé'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($user, JsonResponse::HTTP_OK, [], ['groups' => ['user.index', 'user.show']]);
+    }
+
 }
