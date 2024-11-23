@@ -2,16 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/user', name: 'app_user')]
+    #[Route('/api/user', name: 'app_user', methods: ['GET'])]
     #[IsGranted('ROLE_ADMIN', message: 'No access! Get out!')]
     public function index(
         UserRepository $userRepo,
@@ -38,4 +43,42 @@ class UserController extends AbstractController
             ]
         ],200,[],['groups' => ['user.index']]);
     }
+
+    #[Route('/api/user', name: 'create_user', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN', message: 'Access denied!')]
+    public function createUser(
+        Request $request,
+        UserRepository $userRepo,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager,
+    ): JsonResponse {
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+
+        // Validation : vérifier les contraintes de l'entité User
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages]);
+        }
+
+        if ($userRepo->findOneBy(['email' => $user->getEmail()])) {
+            return $this->json(['error' => 'Email déjà utilisé']);
+        }
+
+        $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($hashedPassword);
+
+        // Sauvegarde dans la base de données
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Utilisateur bien créé'], 201);
+    }
+
 }
