@@ -1,4 +1,3 @@
-# config/packages/lexik_jwt_authentication.yaml
 lexik_jwt_authentication:
   secret_key: "%env(resolve:JWT_SECRET_KEY)%"
   public_key: "%env(resolve:JWT_PUBLIC_KEY)%"
@@ -13,10 +12,14 @@ lexik_jwt_authentication:
 
     cookie:
       enabled: true
-      name: BEARER
+      name: jwt-token-ticket
 
   set_cookies:
-    BEARER: ~
+    jwt-token-ticket:
+      path: /
+      httpOnly: true
+      samesite: none
+      secure: false
 
   remove_token_from_body_when_cookies_used: false
 
