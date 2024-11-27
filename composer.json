@@ -15,6 +15,7 @@
         "fakerphp/faker": "^1.23",
         "knplabs/knp-paginator-bundle": "^6.6",
         "lexik/jwt-authentication-bundle": "^3.1",
+        "nelmio/cors-bundle": "^2.5",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
         "symfony/flex": "^2",
