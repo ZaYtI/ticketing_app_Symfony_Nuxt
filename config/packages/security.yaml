@@ -24,11 +24,14 @@ security:
     api:
       pattern: ^/api
       stateless: true
+      access_denied_handler: App\Security\AccessDeniedHandler
       jwt: ~
 
   access_control:
     - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    - { path: ^/api/register, roles: PUBLIC_ACCESS }
     - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/api/user, roles: ROLE_ADMIN }
 
 when@test:
   security:

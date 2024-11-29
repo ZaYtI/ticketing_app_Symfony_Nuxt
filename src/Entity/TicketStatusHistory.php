@@ -2,27 +2,37 @@
 
 namespace App\Entity;
 
-use App\Entity\Utils\BaseEntity;
 use App\Entity\Utils\Status;
 use App\Repository\TicketStatusHistoryRepository;
 use DateTime;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use function Symfony\Component\Clock\now;
 
 #[ORM\Entity(repositoryClass: TicketStatusHistoryRepository::class)]
 #[ORM\Table(name: "ticket_status_history")]
-class TicketStatusHistory extends BaseEntity
+class TicketStatusHistory
 {
 
     public function __construct()
     {
-        parent::__construct();
         $this->changeAt = new \DateTime();
     }
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private int $id;
+
     #[ORM\Column(type: 'integer', nullable: false, enumType: Status::class)]
+    #[Groups(['ticket.show'])]
     private Status $status;
 
     #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'statusHistory')]
@@ -31,6 +41,7 @@ class TicketStatusHistory extends BaseEntity
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'actions')]
     #[ORM\JoinColumn(name: "changed_user_id")]
+    #[Groups(['ticket.show'])]
     private User $changedBy;
 
 
