@@ -147,4 +147,27 @@ class TicketController extends AbstractController
             'groups' => ['ticket.index', 'ticket.show']
         ]);
     }
+
+    #[Route('api/ticket/chart', name: 'ticket_chart', methods: 'GET')]
+    public function getTicketChart(
+        TicketRepository $ticketRepository
+    ): JsonResponse {
+        /** @var UserInterface|User $currentUser */
+        $currentUser = $this->getUser();
+
+        // Les USER ne peuvent voir que leurs tickets
+        $filters = [];
+        if (!$currentUser->isAdmin()) {
+            $filters['assigned_to'] = $currentUser->getId();
+        }
+
+        // Récupérer les tickets par statut
+        $ticketsByStatus = $ticketRepository->getTicketsByStatus($filters);
+
+        return $this->json([
+            'tickets_by_status' => $ticketsByStatus,
+        ], JsonResponse::HTTP_OK);
+    }
+
+
 }

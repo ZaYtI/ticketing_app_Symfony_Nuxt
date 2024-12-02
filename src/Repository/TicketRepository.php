@@ -50,7 +50,7 @@ class TicketRepository extends ServiceEntityRepository
         );
     }
 
-        /**
+    /**
      * Trouve les tickets qui n'ont pas était mis a jour depuis plus de 2 semaines
      *
      * @return Ticket[]
@@ -66,5 +66,20 @@ class TicketRepository extends ServiceEntityRepository
             ->setParameter('twoWeeksAgo', $twoWeeksAgo)
             ->getQuery()
             ->getResult();
+    }
+
+    public function getTicketsByStatus($filters = [])
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('t.status, COUNT(t.id) as count')
+            ->groupBy('t.status')
+            ->orderBy('t.status', 'ASC');
+
+        if (isset($filters['assigned_to'])) {
+            $qb->andWhere('t.assignedTo = :assignedTo')
+                ->setParameter('assignedTo', $filters['assigned_to']);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }
