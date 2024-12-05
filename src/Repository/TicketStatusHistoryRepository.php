@@ -2,7 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Ticket;
 use App\Entity\TicketStatusHistory;
+use App\Entity\User;
+use App\Entity\Utils\Status;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

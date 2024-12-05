@@ -137,7 +137,6 @@ class TicketController extends AbstractController
         $assignedToUserId = $content['assigned_to_user_id'] ?? -1;
 
         $ticket->setAssignedTo($assignedToUserId === null ? null : $userRepo->find($assignedToUserId));
-
         $entityManager->persist($ticket);
         $entityManager->flush();
 
