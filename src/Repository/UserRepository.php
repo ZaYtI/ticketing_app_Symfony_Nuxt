@@ -47,4 +47,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $limit
         );
     }
+    
+    /**
+     * Used to return all user with ROLE_SUPPORT
+     */
+    public function findSupportUsers(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.roles LIKE :support_role')
+            ->setParameter('support_role', '%"ROLE_SUPPORT"%')
+            ->getQuery()
+            ->getResult();
+    }
 }

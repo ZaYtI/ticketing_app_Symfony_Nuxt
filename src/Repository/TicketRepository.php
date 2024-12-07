@@ -49,4 +49,22 @@ class TicketRepository extends ServiceEntityRepository
             $limit
         );
     }
+
+        /**
+     * Trouve les tickets qui n'ont pas était mis a jour depuis plus de 2 semaines
+     *
+     * @return Ticket[]
+     */
+    public function findUnassignedTickets()
+    {
+        $twoWeeksAgo = new \DateTime();
+        $twoWeeksAgo->modify('-14 days');
+
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.assignedTo IS NULL')
+            ->andWhere('t.updatedAt < :twoWeeksAgo')
+            ->setParameter('twoWeeksAgo', $twoWeeksAgo)
+            ->getQuery()
+            ->getResult();
+    }
 }
