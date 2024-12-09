@@ -79,7 +79,35 @@ class TicketRepository extends ServiceEntityRepository
             $qb->andWhere('t.assignedTo = :assignedTo')
                 ->setParameter('assignedTo', $filters['assigned_to']);
         }
-
+        
         return $qb->getQuery()->getResult();
+    }
+
+    public function getTickets12LastMonths($filters = [])
+    {
+        $oneYearAgo = new \DateTime();
+        $oneYearAgo->modify('-12 months');
+        $oneYearAgoStr = $oneYearAgo->format('Y-m-d H:i:s');
+
+        $sql = "SELECT 
+                CAST(strftime('%m', created_at) AS INTEGER) as m, 
+                COUNT(id) as count 
+            FROM ticket 
+            WHERE created_at > :oneYearAgo";
+
+        $params = ['oneYearAgo' => $oneYearAgoStr];
+
+        // Ajout du filtre assignedTo si présent
+        if (isset($filters['assigned_to'])) {
+            $sql .= " AND assigned_to = :assignedTo";
+            $params['assignedTo'] = $filters['assigned_to'];
+        }
+
+        $sql .= " GROUP BY strftime('%Y', created_at), strftime('%m', created_at)";
+
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt = $connection->prepare($sql);
+
+        return $stmt->executeQuery($params)->fetchAllAssociative();
     }
 }

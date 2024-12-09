@@ -37,18 +37,21 @@ class AppFixtures extends Fixture
         }
 
         $tickets = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $ticket = new Ticket();
-            $ticket->setTitle($faker->title());
-            $ticket->setDescription($faker->text());
-            $ticket->setStatus($faker->randomElement(Status::class));
-            $ticket->setPriority($faker->randomElement(Priority::class));
-            $ticket->setDeadLine((new \DateTime())->modify("+$i days"));
-            $ticket->setAssignedTo($users[array_rand($users)]);
-            $ticket->setCreatedBy($users[array_rand($users)]);
-            $manager->persist($ticket);
-            $tickets[] = $ticket;
-        }
+            for($y = 1; $y <= 12; $y++) {
+                $numberOfTicketsPerMonth = $faker->numberBetween(1, 20);
+                for ($m = 1; $m <= $numberOfTicketsPerMonth; $m++) {
+                    $ticket = new Ticket();
+                    $ticket->setTitle($faker->title());
+                    $ticket->setDescription($faker->text());
+                    $ticket->setStatus($faker->randomElement(Status::class));
+                    $ticket->setPriority($faker->randomElement(Priority::class));
+                    $ticket->setDeadLine((new \DateTime())->modify("+$y days"));
+                    $ticket->setCreatedAt((new \DateTime())->modify("+$y months"));
+                    $ticket->setAssignedTo($users[array_rand($users)]);
+                    $manager->persist($ticket);
+                    $tickets[] = $ticket;
+                }
+            }
 
         foreach ($tickets as $ticket) {
             for ($j = 0; $j < 3; $j++) {
