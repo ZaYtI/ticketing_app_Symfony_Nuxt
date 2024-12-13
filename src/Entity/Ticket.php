@@ -42,12 +42,10 @@ class Ticket
     private string $description;
 
     #[ORM\Column(enumType: Status::class, type: 'integer', nullable: false)]
-    // #[Assert\Isin(Status::class)]
     #[Groups(['ticket.index'])]
     private Status $status;
 
     #[ORM\Column(enumType: Priority::class, type: 'integer', nullable: false)]
-    // #[Assert\Isin(Priority::class)]
     #[Groups(['ticket.index'])]
     private Priority $priority;
 
@@ -62,6 +60,12 @@ class Ticket
     #[Groups(['ticket.show'])]
     #[SerializedName('assigner_to')]
     private ?User $assignedTo = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'createdTickets')]
+    #[ORM\JoinColumn(name: 'created_by_id')]
+    #[Groups(['ticket.show'])]
+    #[SerializedName('created_by')]
+    private User $createdBy;
 
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'ticket')]
     #[Groups(['ticket.show'])]
@@ -139,6 +143,18 @@ class Ticket
     public function setAssignedTo(?User $assignedTo): self
     {
         $this->assignedTo = $assignedTo;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

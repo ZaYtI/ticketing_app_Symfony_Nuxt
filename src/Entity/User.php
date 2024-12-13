@@ -59,6 +59,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user.show'])]
     private Collection $assignedTickets;
 
+    #[ORM\OneToMany(targetEntity: Ticket::class, mappedBy: 'createdBy')]
+    #[Groups(['user.show'])]
+    private Collection $createdTickets;
+
     #[ORM\OneToMany(targetEntity: TicketStatusHistory::class, mappedBy: 'changedBy')]
     private Collection $actions;
 
@@ -151,6 +155,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getAssignedTickets(): Collection
     {
         return $this->assignedTickets;
+    }
+
+    public function getCreatedTickets(): Collection
+    {
+        return $this->createdTickets;
     }
 
     public function getAction(): Collection

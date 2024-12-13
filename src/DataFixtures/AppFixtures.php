@@ -45,6 +45,7 @@ class AppFixtures extends Fixture
             $ticket->setPriority($faker->randomElement(Priority::class));
             $ticket->setDeadLine((new \DateTime())->modify("+$i days"));
             $ticket->setAssignedTo($users[array_rand($users)]);
+            $ticket->setCreatedBy($users[array_rand($users)]);
             $manager->persist($ticket);
             $tickets[] = $ticket;
         }
