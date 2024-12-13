@@ -90,6 +90,7 @@ class TicketController extends AbstractController
         $content = $request->toArray();
         $assignedToUserId = $content['assigned_to_user_id'] ?? -1;
 
+        $ticket->setCreatedBy($this->getUser());
         $ticket->setAssignedTo($userRepo->find($assignedToUserId));
 
         $entityManager->persist($ticket);
@@ -129,7 +130,9 @@ class TicketController extends AbstractController
 
         /** @var UserInterface|User $currentUser */
         $currentUser = $this->getUser();
-        if (!$currentUser->isAdmin() && $ticket->getAssignedTo()->getId() !== $currentUser->getId()) {
+        /** @var UserInterface|User $currentUser */
+        $assignedUser = $ticket->getAssignedTo();
+        if (!$currentUser->isAdmin() && (!$assignedUser || $assignedUser->getId() !== $currentUser->getId())){
             return $this->json(['error' => 'You are not authorized to update this ticket'], JsonResponse::HTTP_FORBIDDEN);
         }
 

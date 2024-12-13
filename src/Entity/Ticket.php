@@ -50,7 +50,6 @@ class Ticket
     private Priority $priority;
 
     #[ORM\Column(type: 'datetime', nullable: true, name: 'dead_line')]
-    #[Assert\DateTime()]
     #[Groups(['ticket.index'])]
     #[SerializedName('dead_line')]
     private ?DateTime $deadLine = null;
