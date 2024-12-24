@@ -18,10 +18,11 @@ class Ticket
 {
     public function __construct()
     {
+        $date = new DateTime();
         $this->status = Status::OPEN;
         $this->priority = Priority::LOW;
         $this->statusHistory = new ArrayCollection();
-        $this->createdAt = new DateTime();
+        $this->createdAt = $date->modify('-1 month');
         $this->updatedAt = new DateTime();
     }
 
@@ -166,6 +167,11 @@ class Ticket
     public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTime $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 
     public function getUpdatedAt(): DateTime
