@@ -155,20 +155,18 @@ class TicketController extends AbstractController
         /** @var UserInterface|User $currentUser */
         $currentUser = $this->getUser();
 
-        // Les USER ne peuvent voir que leurs tickets
         $filters = [];
         if (!$currentUser->isAdmin()) {
-            $filters['assigned_to'] = $currentUser->getId();
+            $filters['assigned_user_id'] = $currentUser->getId();
         }
 
-        // Récupérer les tickets par statut
         $ticketsByStatus = $ticketRepository->getTicketsByStatus($filters);
 
         //Tickets sur les 12 derniers mois
         $ticketsLast12Months = $ticketRepository->getTickets12LastMonths($filters);
 
         return $this->json([
-           'tickets_12_last_months' => $ticketsLast12Months,
+            'tickets_12_last_months' => $ticketsLast12Months,
             'tickets_by_status' => $ticketsByStatus,
         ], JsonResponse::HTTP_OK);
     }
