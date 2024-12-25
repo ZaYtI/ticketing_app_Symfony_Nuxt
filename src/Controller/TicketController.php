@@ -86,8 +86,6 @@ class TicketController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         UserRepository $userRepo
     ): JsonResponse {
-        /** @var UserInterface|User $currentUser */
-        $currentUser = $this->getUser();
         $ticket = $serializer->deserialize($request->getContent(), Ticket::class, 'json');
 
         $errors = $validator->validate($ticket);
