@@ -24,24 +24,31 @@ class TicketRepository extends ServiceEntityRepository
 
     public function findTicketsWithPaginationAndFilters(
         array $filters,
-        int $page,
+        int $page, 
         int $limit,
         ?string $sort = null,
         ?string $direction = 'asc'
     ) {
         $queryBuilder = $this->createQueryBuilder('t');
-    
+        
         $allowedFilters = [
             'assign_user_id' => 't.assignedTo',
-            'status' => 't.status',
+            'status' => 't.status', 
             'created_by_id' => 't.createdBy',
             'priority' => 't.priority',
+            'id' => 't.id' // Modifié 'ids' en 'id'
         ];
     
         foreach ($filters as $field => $value) {
             if (isset($allowedFilters[$field]) && $value !== null) {
-                $queryBuilder->andWhere(sprintf('%s = :%s', $allowedFilters[$field], $field))
-                    ->setParameter($field, $value);
+                // Cas spécial pour le filtre d'ID qui accepte un tableau
+                if ($field === 'id' && is_array($value) && !empty($value)) {
+                    $queryBuilder->andWhere($queryBuilder->expr()->in($allowedFilters[$field], ':' . $field))
+                        ->setParameter($field, $value);
+                } else {
+                    $queryBuilder->andWhere(sprintf('%s = :%s', $allowedFilters[$field], $field))
+                        ->setParameter($field, $value);
+                }
             }
         }
     
@@ -62,7 +69,10 @@ class TicketRepository extends ServiceEntityRepository
         if ($sort && in_array($sort, $allowedSortFields)) {
             $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
             $queryBuilder->orderBy("t.$sort", $direction);
+        } else {
+            $queryBuilder->orderBy('t.id', 'ASC');
         }
+    
         return $this->paginator->paginate(
             $queryBuilder,
             $page,
