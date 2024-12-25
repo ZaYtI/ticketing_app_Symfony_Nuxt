@@ -34,6 +34,7 @@ class TicketController extends AbstractController
         $filters = [];
         if (!$currentUser->isAdmin()) {
             $filters['assign_user_id'] = $currentUser->getId();
+            $filters['created_by_id'] = $currentUser->getId();
         }
 
         $paginatedTickets = $repository->findTicketsWithPaginationAndFilters($filters, $page, $limit);
@@ -83,7 +84,8 @@ class TicketController extends AbstractController
         UrlGeneratorInterface $urlGenerator,
         UserRepository $userRepo
     ): JsonResponse {
-
+        /** @var UserInterface|User $currentUser */
+        $currentUser = $this->getUser();
         $ticket = $serializer->deserialize($request->getContent(), Ticket::class, 'json');
 
         $errors = $validator->validate($ticket);
@@ -141,7 +143,11 @@ class TicketController extends AbstractController
         $currentUser = $this->getUser();
         /** @var UserInterface|User $currentUser */
         $assignedUser = $ticket->getAssignedTo();
-        if (!$currentUser->isAdmin() && (!$assignedUser || $assignedUser->getId() !== $currentUser->getId())){
+        if (
+            !$currentUser->isAdmin() &&
+            (!$assignedUser || $assignedUser->getId() !== $currentUser->getId()) &&
+            ($ticket->getCreatedBy()->getId() !== $currentUser->getId())
+        ) {
             return $this->json(['error' => 'You are not authorized to update this ticket'], JsonResponse::HTTP_FORBIDDEN);
         }
 
