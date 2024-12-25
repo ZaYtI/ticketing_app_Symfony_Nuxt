@@ -108,7 +108,7 @@ class TicketRepository extends ServiceEntityRepository
     public function getTickets12LastMonths($filters = [])
     {
         $oneYearAgo = new \DateTime();
-        $oneYearAgo->modify('-12 months');
+        $oneYearAgo->modify('-11 months');
         $oneYearAgoStr = $oneYearAgo->format('Y-m-d H:i:s');
 
         $sql = "SELECT 
