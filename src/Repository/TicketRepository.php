@@ -107,9 +107,13 @@ class TicketRepository extends ServiceEntityRepository
             ->groupBy('t.status')
             ->orderBy('t.status', 'ASC');
 
-        if (isset($filters['assigned_to'])) {
-            $qb->andWhere('t.assignedTo = :assignedTo')
-                ->setParameter('assignedTo', $filters['assigned_to']);
+        if (isset($filters['createdBy'])) {
+            $qb->andWhere('t.createdBy = :createdBy')
+                ->setParameter('createdBy', $filters['createdBy']);
+        }
+        if (isset($filters['assignedTo'])) {
+            $qb->orWhere('t.assignedTo = :assignedTo')
+                ->setParameter('assignedTo', $filters['assignedTo']);
         }
         
         return $qb->getQuery()->getResult();
@@ -130,9 +134,14 @@ class TicketRepository extends ServiceEntityRepository
         $params = ['oneYearAgo' => $oneYearAgoStr];
 
         // Ajout du filtre assignedTo si présent
-        if (isset($filters['assigned_to'])) {
-            $sql .= " AND assigned_to = :assignedTo";
-            $params['assignedTo'] = $filters['assigned_to'];
+        if (isset($filters['createdBy'])) {
+            $sql .= " AND created_by_id = :createdBy";
+            $params['createdBy'] = $filters['createdBy'];
+        }
+        //Pour les tickets assignés aux supports
+        if (isset($filters['assignedTo'])) {
+            $sql .= " OR assign_user_id = :assignedTo";
+            $params['assignedTo'] = $filters['assignedTo'];
         }
 
         $sql .= " GROUP BY strftime('%Y', created_at), strftime('%m', created_at)";
