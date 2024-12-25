@@ -18,12 +18,12 @@ class Ticket
 {
     public function __construct()
     {
-        $date = new DateTime();
+        $currentDate = new DateTime();
         $this->status = Status::OPEN;
         $this->priority = Priority::LOW;
         $this->statusHistory = new ArrayCollection();
-        $this->createdAt = $date->modify('-1 month');
-        $this->updatedAt = new DateTime();
+        $this->createdAt = $currentDate;
+        $this->updatedAt = $currentDate;
     }
 
     #[ORM\Id]
