@@ -172,8 +172,14 @@ class TicketController extends AbstractController
         $currentUser = $this->getUser();
 
         $filters = [];
-        if (!$currentUser->isAdmin()) {
-            $filters['assigned_user_id'] = $currentUser->getId();
+        //Ajout des contrôles pr ceux non admin
+        if(!$currentUser->isAdmin()) {
+            if ((in_array('ROLE_USER', $currentUser->getRoles(), true))) {
+                $filters['createdBy'] = $currentUser->getId();
+            }
+            if ((in_array('ROLE_SUPPORT', $currentUser->getRoles(), true))) {
+                $filters['assignedTo'] = $currentUser->getId();
+            }
         }
 
         $ticketsByStatus = $ticketRepository->getTicketsByStatus($filters);
