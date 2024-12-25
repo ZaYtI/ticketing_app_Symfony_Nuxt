@@ -56,4 +56,16 @@ class AuthController extends AbstractController
             'groups' => ['user.index']
         ]);
     }
+
+    #[Route('api/logout', name: 'app_user_logout', methods: 'GET')]
+    public function logout(): JsonResponse
+    {
+        $response = new JsonResponse(['message' => 'Logout successful'], 200);
+        
+        $response->headers->clearCookie('PHPSESSID');
+
+        $response->headers->clearCookie('jwt-token-ticket');
+
+        return $response;
+    }
 }
