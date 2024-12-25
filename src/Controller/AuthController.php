@@ -2,19 +2,17 @@
 
 namespace App\Controller;
 
-use App\Controller\Utils\EntityValidationTrait;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class RegistrationController extends AbstractController
+class AuthController extends AbstractController
 {
-
     #[Route('/api/register', methods: ['POST'])]
     public function register(
         Request $request,
@@ -49,5 +47,13 @@ class RegistrationController extends AbstractController
         } catch (\Exception $e) {
             return $this->json(['error' => 'Failed to save user: ' . $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    #[Route('api/me', name: 'app_user_me', methods: 'GET')]
+    public function userInfo(): JsonResponse
+    {
+        return $this->json($this->getUser(), 200, [], [
+            'groups' => ['user.index']
+        ]);
     }
 }
