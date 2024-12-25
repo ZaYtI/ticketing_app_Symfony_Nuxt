@@ -57,6 +57,15 @@ class TicketController extends AbstractController
         ]);
     }
 
+    #[Route('api/ticket/assignable', name: 'app_ticket_assignable', methods: 'GET')]
+    #[IsGranted('ROLE_SUPPORT', message: 'You must be an support for this action')]
+    public function getAssignableUser(UserRepository $repository): JsonResponse
+    {
+        return $this->json($repository->findSupportUsers(), 200, [], [
+            'groups' => ['user.select']
+        ]);
+    }
+
     #[Route('api/ticket/{id}', name: 'detailTicket', requirements: ['id' => Requirement::DIGITS], methods: 'GET')]
     public function show(Ticket $ticket): JsonResponse
     {
@@ -170,6 +179,4 @@ class TicketController extends AbstractController
             'tickets_by_status' => $ticketsByStatus,
         ], JsonResponse::HTTP_OK);
     }
-
-
 }

@@ -32,14 +32,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['ticket.show', 'user.index', 'user.show', 'user.show'])]
+    #[Groups(['ticket.show', 'user.index', 'user.show', 'user.show','user.select'])]
     private int $id;
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
     #[Assert\Email(
         mode: Email::VALIDATION_MODE_STRICT
     )]
-    #[Groups(['ticket.show', 'user.index', 'user.show'])]
+    #[Groups(['ticket.show', 'user.index', 'user.show','user.select'])]
     private string $email;
 
     /**

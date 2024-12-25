@@ -17,7 +17,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 {
 
     private PaginatorInterface $paginator;
-    public function __construct(ManagerRegistry $registry,PaginatorInterface $paginator)
+    public function __construct(ManagerRegistry $registry, PaginatorInterface $paginator)
     {
         parent::__construct($registry, User::class);
         $this->paginator = $paginator;
@@ -47,15 +47,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $limit
         );
     }
-    
+
     /**
-     * Used to return all user with ROLE_SUPPORT
+     * Used to return all users with ROLE_SUPPORT or ROLE_ADMIN
      */
     public function findSupportUsers(): array
     {
         return $this->createQueryBuilder('u')
-            ->andWhere('u.roles LIKE :support_role')
+            ->andWhere('u.roles LIKE :support_role OR u.roles LIKE :admin_role')
             ->setParameter('support_role', '%"ROLE_SUPPORT"%')
+            ->setParameter('admin_role', '%"ROLE_ADMIN"%')
             ->getQuery()
             ->getResult();
     }
