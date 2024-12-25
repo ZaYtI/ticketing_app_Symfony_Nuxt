@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Ticket;
+use App\Entity\Utils\Priority;
+use App\Entity\Utils\Status;
 use App\Repository\TicketRepository;
 use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -80,16 +83,29 @@ class TicketController extends AbstractController
     #[Route('api/ticket', methods: 'POST')]
     public function createTicket(
         Request $request,
-        SerializerInterface $serializer,
         EntityManagerInterface $entityManager,
         ValidatorInterface $validator,
         UrlGeneratorInterface $urlGenerator,
         UserRepository $userRepo
     ): JsonResponse {
-        $ticket = $serializer->deserialize($request->getContent(), Ticket::class, 'json');
-
+        $content = $request->toArray();
+        $ticket = new Ticket();
+        $ticket->setTitle($content['title'] ?? '');
+        $ticket->setDescription($content['description'] ?? '');
+        $ticket->setStatus(Status::tryFrom($content['status']) ?? Status::OPEN);
+        $ticket->setPriority(Priority::tryFrom($content['priority']) ?? Priority::LOW);
+        if (!empty($content['dead_line'])) {
+            try {
+                $deadLine = new \DateTime($content['dead_line']);
+                $ticket->setDeadLine($deadLine);
+            } catch (\Exception $e) {
+                return $this->json(['errors' => ['Invalid date format for dead_line']], JsonResponse::HTTP_BAD_REQUEST);
+            }
+        }
+        $ticket->setCreatedBy($this->getUser());
+        $assignedToUserId = $content['assigned_to_user_id'] ?? null;
+        $ticket->setAssignedTo($assignedToUserId ? $userRepo->find($assignedToUserId) : null);
         $errors = $validator->validate($ticket);
-
         if (count($errors) > 0) {
             $errorMessages = [];
             foreach ($errors as $error) {
@@ -97,22 +113,16 @@ class TicketController extends AbstractController
             }
             return $this->json(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
-
-        $content = $request->toArray();
-        $assignedToUserId = $content['assigned_to_user_id'] ?? -1;
-
-        $ticket->setCreatedBy($this->getUser());
-        $ticket->setAssignedTo($userRepo->find($assignedToUserId));
-
         $entityManager->persist($ticket);
         $entityManager->flush();
-
+    
         $location = $urlGenerator->generate('detailTicket', ['id' => $ticket->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
+    
         return $this->json($ticket, JsonResponse::HTTP_CREATED, ["Location" => $location], [
             'groups' => ['ticket.index', 'ticket.show']
         ]);
     }
+    
 
     #[Route('api/ticket/{id}', name: 'updateTicket', requirements: ['id' => Requirement::DIGITS], methods: 'PUT')]
     public function updateTicket(
@@ -173,7 +183,7 @@ class TicketController extends AbstractController
 
         $filters = [];
         //Ajout des contrôles pr ceux non admin
-        if(!$currentUser->isAdmin()) {
+        if (!$currentUser->isAdmin()) {
             if ((in_array('ROLE_USER', $currentUser->getRoles(), true))) {
                 $filters['createdBy'] = $currentUser->getId();
             }
