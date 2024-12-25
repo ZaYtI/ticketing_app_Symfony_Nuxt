@@ -30,7 +30,7 @@ class AppFixtures extends Fixture
         //Admin permanent
         $adminUser = new User();
         $adminUser->setEmail('admin@ticketing.com');
-        $adminUser->setRoles(['ROLE_ADMIN']);
+        $adminUser->setRoles(['ROLE_USER','ROLE_SUPPORT','ROLE_ADMIN']);
         $hashedPassword = $this->passwordHasher->hashPassword($adminUser, 'password');
         $adminUser->setPassword($hashedPassword);
 
@@ -41,7 +41,7 @@ class AppFixtures extends Fixture
         //Support permanent
         $supportUser = new User();
         $supportUser->setEmail('support@ticketing.com');
-        $supportUser->setRoles(['ROLE_SUPPORT']);
+        $supportUser->setRoles(['ROLE_USER','ROLE_SUPPORT']);
         $hashedPassword = $this->passwordHasher->hashPassword($supportUser, 'password');
         $supportUser->setPassword($hashedPassword);
 
