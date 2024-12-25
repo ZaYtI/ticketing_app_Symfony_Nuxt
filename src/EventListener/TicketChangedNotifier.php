@@ -27,10 +27,8 @@ class TicketChangedNotifier
 
     public function postUpdate(Ticket $ticket): void
     {
-        //Le UnitOfWorks permet de suivre le changement de l'entité
         $unitOfWork = $this->entityManager->getUnitOfWork();
         
-        //Permet d'obtenir la liste des changement du ticket
         $changeSet = $unitOfWork->getEntityChangeSet($ticket);
 
         if (isset($changeSet['status'])) {
@@ -40,7 +38,7 @@ class TicketChangedNotifier
             if($oldStatus != $newStatus){
                 $statusHistory = new TicketStatusHistory();
                 $statusHistory->setTicket($ticket);
-                $statusHistory->setStatus(Status::from($oldStatus));
+                $statusHistory->setStatus(Status::from($newStatus));
                 
                 $user = $this->tokenStorage->getToken()->getUser();
                 $statusHistory->setChangedBy($user);
