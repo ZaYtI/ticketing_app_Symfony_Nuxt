@@ -58,7 +58,7 @@ class Ticket
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'assignedTickets')]
     #[ORM\JoinColumn(name: 'assign_user_id')]
     #[Groups(['ticket.show'])]
-    #[SerializedName('assigner_to')]
+    #[SerializedName('assign_to')]
     private ?User $assignedTo = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'createdTickets')]
