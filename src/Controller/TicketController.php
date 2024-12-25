@@ -33,8 +33,10 @@ class TicketController extends AbstractController
 
         $filters = [];
         if (!$currentUser->isAdmin()) {
-            $filters['assign_user_id'] = $currentUser->getId();
-            $filters['created_by_id'] = $currentUser->getId();
+            $filters['or'] = [
+                'assign_user_id' => $currentUser->getId(),
+                'created_by_id' => $currentUser->getId(),
+            ];
         }
 
         $paginatedTickets = $repository->findTicketsWithPaginationAndFilters($filters, $page, $limit);

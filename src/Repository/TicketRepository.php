@@ -22,33 +22,55 @@ class TicketRepository extends ServiceEntityRepository
         $this->paginator = $paginator;
     }
 
-    public function findTicketsWithPaginationAndFilters(array $filters, int $page, int $limit)
-    {
+    public function findTicketsWithPaginationAndFilters(
+        array $filters,
+        int $page,
+        int $limit,
+        ?string $sort = null,
+        ?string $direction = 'asc'
+    ) {
         $queryBuilder = $this->createQueryBuilder('t');
-
+    
+        $allowedFilters = [
+            'assign_user_id' => 't.assignedTo',
+            'status' => 't.status',
+            'created_by_id' => 't.createdBy',
+            'priority' => 't.priority',
+        ];
+    
         foreach ($filters as $field => $value) {
-            if ($value !== null) {
-                switch ($field) {
-                    case 'assign_user_id':
-                        $queryBuilder->andWhere('t.assignedTo = :assign_user_id')
-                            ->setParameter('assign_user_id', $value);
-                        break;
-                    case 'status':
-                        $queryBuilder->andWhere('t.status = :status')
-                            ->setParameter('status', $value);
-                        break;
-                    default:
-                        break;
-                }
+            if (isset($allowedFilters[$field]) && $value !== null) {
+                $queryBuilder->andWhere(sprintf('%s = :%s', $allowedFilters[$field], $field))
+                    ->setParameter($field, $value);
             }
         }
-
+    
+        if (isset($filters['or']) && is_array($filters['or'])) {
+            $orX = $queryBuilder->expr()->orX();
+            foreach ($filters['or'] as $field => $value) {
+                if (isset($allowedFilters[$field]) && $value !== null) {
+                    $orX->add(sprintf('%s = :or_%s', $allowedFilters[$field], $field));
+                    $queryBuilder->setParameter("or_$field", $value);
+                }
+            }
+            if ($orX->count() > 0) {
+                $queryBuilder->andWhere($orX);
+            }
+        }
+    
+        $allowedSortFields = ['id', 'status', 'priority', 'created_at', 'updated_at'];
+        if ($sort && in_array($sort, $allowedSortFields)) {
+            $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
+            $queryBuilder->orderBy("t.$sort", $direction);
+        }
         return $this->paginator->paginate(
             $queryBuilder,
             $page,
             $limit
         );
     }
+    
+
 
     /**
      * Trouve les tickets qui n'ont pas était mis a jour depuis plus de 2 semaines
