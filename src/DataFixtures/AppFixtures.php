@@ -26,6 +26,29 @@ class AppFixtures extends Fixture
         $faker = Factory::create('fr_FR');
 
         $users = [];
+
+        //Admin permanent
+        $adminUser = new User();
+        $adminUser->setEmail('admin@ticketing.com');
+        $adminUser->setRoles(['ROLE_ADMIN']);
+        $hashedPassword = $this->passwordHasher->hashPassword($adminUser, 'password');
+        $adminUser->setPassword($hashedPassword);
+
+        $manager->persist($adminUser);
+        $users[] = $adminUser;
+
+
+        //Support permanent
+        $supportUser = new User();
+        $supportUser->setEmail('support@ticketing.com');
+        $supportUser->setRoles(['ROLE_SUPPORT']);
+        $hashedPassword = $this->passwordHasher->hashPassword($supportUser, 'password');
+        $supportUser->setPassword($hashedPassword);
+
+        $manager->persist($supportUser);
+        $users[] = $supportUser;
+
+
         for ($i = 1; $i <= 5; $i++) {
             $user = new User();
             $user->setEmail($faker->email());
